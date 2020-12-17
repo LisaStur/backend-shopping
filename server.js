@@ -2,26 +2,8 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import cors from 'cors'
 import mongoose from 'mongoose'
-import crypto from 'crypto'
 import bcrypt from 'bcrypt'
-
-const User = mongoose.model('User', {
-  name: {
-    type: String,
-    unique: true,
-    required: true,
-    minlength: 3
-  },
-  password: {
-    type: String,
-    required: true,
-    minlength: 3
-  },
-  accessToken: {
-    type: String,
-    default: () => crypto.randomBytes(128).toString('hex')
-  }
-})
+import { User } from './models/user'
 
 const mongoUrl = process.env.MONGO_URL || 'mongodb://localhost/shopping'
 mongoose.connect(mongoUrl, { useNewUrlParser: true, useFindAndModify: false, useCreateIndex: true, useUnifiedTopology: true })
