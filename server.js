@@ -59,6 +59,7 @@ app.get('/', (req, res) =>
   res.send('Shopping List')
 )
 
+// Create user
 app.post('/users', async (req, res) => {
   try {
     const { name, password } = req.body
@@ -68,6 +69,21 @@ app.post('/users', async (req, res) => {
     res.status(201).json({ userId: user._id, accessToken: user.accessToken })
   } catch (err) {
     res.status(400).json({ message: 'Could not create user', errors: err.errors })
+  }
+})
+
+// Login user
+app.post('/sessions', async (req, res) => {
+  try {
+    const { name, password } = req.body
+    const user = await User.findOne({ name })
+    if (user && bcrypt.compareSync(password, user.password)) {
+      res.status(201).json({ userId: user._id, accessToken: user.accessToken })
+    } else {
+      res.status(404).json({ message: 'User not found' })
+    }
+  } catch (err) {
+    res.status(404).json({ notFound: true })
   }
 })
 
