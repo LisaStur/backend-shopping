@@ -4,6 +4,7 @@ import cors from 'cors'
 import mongoose from 'mongoose'
 import bcrypt from 'bcrypt'
 import { User } from './models/user'
+import { Item } from './models/item'
 
 const mongoUrl = process.env.MONGO_URL || 'mongodb://localhost/shopping'
 mongoose.connect(mongoUrl, { useNewUrlParser: true, useFindAndModify: false, useCreateIndex: true, useUnifiedTopology: true })
@@ -69,9 +70,21 @@ app.post('/sessions', async (req, res) => {
   }
 })
 
-app.get('/testingauths', authenticateUser)
-app.get('/testingauths', (req, res) => {
-  res.json({ test: 'Testing Authorisation' })
+app.post('/items', authenticateUser)
+app.post('/items', async (req, res) => {
+  try {
+    const { item, section, basket } = req.body
+    const addedItem = await new Item({ item, section, basket, shopper: req.user._id }).save()
+    res.status(201).json(addedItem)
+  } catch (err) {
+    res.status(400).json({ message: 'Could not save item', errors: err.errors })
+  }
+})
+
+app.get('/items', authenticateUser)
+app.get('/items', async (req, res) => {
+  const messages = await Item.find().populate('shopper', 'name').sort({ createdAt: 'desc' }).exec()
+  res.json(messages)
 })
 
 app.listen(port, () => console.log(`Server running on http://localhost:${port}`))
