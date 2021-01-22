@@ -87,4 +87,14 @@ app.get('/items', async (req, res) => {
   res.json(messages)
 })
 
+app.delete('/items/:itemId', async (req, res) => {
+  try {
+    const { itemId } = req.params
+    const item = await Item.findOneAndDelete({ _id: itemId })
+    res.status(200).json(item)
+  } catch (err) {
+    res.status(400).json({ message: 'Could not delete item, not found', error: err.errors })
+  }
+})
+
 app.listen(port, () => console.log(`Server running on http://localhost:${port}`))
